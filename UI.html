@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Academic Architect | Institutional Management</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-surface": "#2e3132",
+                        "tertiary-fixed": "#ffdcc1",
+                        "secondary-container": "#d6e3fd",
+                        "tertiary-container": "#643500",
+                        "on-tertiary-fixed": "#2e1500",
+                        "on-surface-variant": "#43474f",
+                        "on-error": "#ffffff",
+                        "tertiary": "#442200",
+                        "primary-container": "#1a4173",
+                        "primary-fixed-dim": "#a8c8ff",
+                        "outline-variant": "#c3c6d0",
+                        "surface-container-high": "#e7e8e9",
+                        "primary": "#002b57",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-secondary-container": "#59657b",
+                        "on-primary-fixed": "#001b3c",
+                        "on-primary-fixed-variant": "#224779",
+                        "primary-fixed": "#d5e3ff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3b475c",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-on-surface": "#f0f1f2",
+                        "background": "#f8f9fa",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#edeeef",
+                        "on-surface": "#191c1d",
+                        "inverse-primary": "#a8c8ff",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-variant": "#e1e3e4",
+                        "surface-dim": "#d9dadb",
+                        "outline": "#737780",
+                        "on-primary-container": "#8caee7",
+                        "secondary": "#535f75",
+                        "on-tertiary-fixed-variant": "#6b3b05",
+                        "surface-tint": "#3c5f93",
+                        "on-error-container": "#93000a",
+                        "on-background": "#191c1d",
+                        "secondary-fixed": "#d6e3fd",
+                        "secondary-fixed-dim": "#bac7e0",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f8f9fa",
+                        "on-tertiary-container": "#e39e62",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#0f1c2f",
+                        "tertiary-fixed-dim": "#ffb779"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    fontFamily: {
+                        headline: ["Manrope"],
+                        body: ["Manrope"],
+                        label: ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Manrope', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #002b57 0%, #1a4173 100%);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c3c6d0; border-radius: 10px; }
+    </style>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
+    <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+</head>
+<body class="bg-surface text-on-surface">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+        const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+        // --- Common Components ---
+
+        const SideNavBar = ({ role = 'admin', activePath }) => {
+            const isAdmin = role === 'admin';
+            const isFaculty = role === 'faculty';
+
+            return (
+                <aside className="w-[280px] h-screen sticky left-0 top-0 bg-slate-100 dark:bg-slate-900 flex flex-col py-8 px-4 z-50">
+                    <div className="mb-10 px-4">
+                        <h1 className="text-xl font-bold tracking-wider text-[#1A4173] dark:text-blue-400">Academic Architect</h1>
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 mt-1">
+                            {isAdmin ? 'Administrative Portal' : 'Faculty Portal'}
+                        </p>
+                    </div>
+                    <nav className="flex-1 space-y-1">
+                        <Link to={isAdmin ? "/admin-dashboard" : "/faculty-dashboard"} className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activePath.includes('dashboard') ? 'bg-white/50 dark:bg-slate-800/50 text-[#1A4173] border-l-4 border-[#1A4173] font-bold' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}`}>
+                            <span className="material-symbols-outlined">dashboard</span>
+                            <span>Dashboard</span>
+                        </Link>
+                        
+                        {isAdmin && (
+                            <Link to="/user-management" className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activePath === '/user-management' ? 'bg-white/50 dark:bg-slate-800/50 text-[#1A4173] border-l-4 border-[#1A4173] font-bold' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}`}>
+                                <span className="material-symbols-outlined">group</span>
+                                <span>User Management</span>
+                            </Link>
+                        )}
+
+                        <Link to="/class-management" className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activePath.includes('class') ? 'bg-white/50 dark:bg-slate-800/50 text-[#1A4173] border-l-4 border-[#1A4173] font-bold' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}`}>
+                            <span className="material-symbols-outlined">groups</span>
+                            <span>Classes</span>
+                        </Link>
+
+                        <Link to="/student-directory" className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activePath === '/student-directory' ? 'bg-white/50 dark:bg-slate-800/50 text-[#1A4173] border-l-4 border-[#1A4173] font-bold' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}`}>
+                            <span className="material-symbols-outlined">school</span>
+                            <span>Students</span>
+                        </Link>
+
+                        {isFaculty && (
+                            <Link to="/attendance-realtime" className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activePath === '/attendance-realtime' ? 'bg-white/50 dark:bg-slate-800/50 text-[#1A4173] border-l-4 border-[#1A4173] font-bold' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}`}>
+                                <span className="material-symbols-outlined">how_to_reg</span>
+                                <span>Attendance</span>
+                            </Link>
+                        )}
+
+                        <Link to="/grade-monitoring" className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activePath === '/grade-monitoring' ? 'bg-white/50 dark:bg-slate-800/50 text-[#1A4173] border-l-4 border-[#1A4173] font-bold' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}`}>
+                            <span className="material-symbols-outlined">analytics</span>
+                            <span>Grade Monitoring</span>
+                        </Link>
+
+                        <Link to="/early-warning" className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activePath === '/early-warning' ? 'bg-white/50 dark:bg-slate-800/50 text-[#1A4173] border-l-4 border-[#1A4173] font-bold' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}`}>
+                            <span className="material-symbols-outlined">notifications_active</span>
+                            <span>Alerts</span>
+                        </Link>
+
+                        <Link to="/parent-reporting" className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activePath === '/parent-reporting' ? 'bg-white/50 dark:bg-slate-800/50 text-[#1A4173] border-l-4 border-[#1A4173] font-bold' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800'}`}>
+                            <span className="material-symbols-outlined">assessment</span>
+                            <span>System Reports</span>
+                        </Link>
+                    </nav>
+                    <div className="mt-auto space-y-1 border-t border-slate-200 dark:border-slate-800 pt-6">
+                        <Link to="/login" className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+                            <span className="material-symbols-outlined">logout</span>
+                            <span>Logout</span>
+                        </Link>
+                        <div className="mt-4 px-4 py-3 bg-primary-container text-on-primary-container rounded-xl text-xs flex items-center justify-between">
+                            <span>System Status</span>
+                            <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]"></span>
+                        </div>
+                    </div>
+                </aside>
+            );
+        };
+
+        const TopAppBar = ({ title = "Decision Support" }) => {
+            return (
+                <header className="h-16 sticky top-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50 flex justify-between items-center w-full px-8 shadow-sm dark:shadow-none">
+                    <div className="flex items-center gap-8">
+                        <span className="text-lg font-black text-[#1A4173] dark:text-blue-400">{title}</span>
+                        <nav className="hidden lg:flex items-center gap-6 font-manrope text-sm tracking-wide uppercase font-semibold">
+                            <a className="text-slate-400 dark:text-slate-500 hover:text-[#1A4173] transition-colors" href="#">Global View</a>
+                            <a className="text-[#1A4173] border-b-2 border-[#1A4173] pb-1" href="#">Departmental</a>
+                            <a className="text-slate-400 dark:text-slate-500 hover:text-[#1A4173] transition-colors" href="#">Faculty</a>
+                        </nav>
+                    </div>
+                    <div className="flex items-center gap-6">
+                        <div className="relative hidden md:block">
+                            <input className="bg-surface-container-low border-none rounded-full px-4 py-1.5 text-xs w-64 focus:ring-1 focus:ring-primary" placeholder="Search resources..." type="text"/>
+                            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-slate-500">
+                            <button className="hover:text-primary transition-colors"><span className="material-symbols-outlined">notifications</span></button>
+                            <button className="hover:text-primary transition-colors" onClick={() => document.documentElement.classList.toggle('dark')}><span className="material-symbols-outlined">dark_mode</span></button>
+                            <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-200">
+                                <img alt="Admin Profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIav1ridzn0I8MmI0DaDE6Lt7FqzzQMCGiBfMLbmlFMMVLYWSPymHx1ATDWPfoHGWIDDVOjvQZACuwd6cN33itFgZjKlK34kmRcZdXPL5CcrJSVQxifwAa_9cSu22W99g-fB1BV__lpmVJQH0tFf4matpC7pyzR13jIteyRbpq6Fv-uxSRCuq7RzpFVY8lRiXXrjESRVMab6llAdjdoj3gDSi1DyMmZilTEVbxq4CvMpQ693Sqs649B77ZKRVDY_GSOLN-7jr_hhRo"/>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            );
+        };
+
+        // --- Page Components ---
+
+        const LoginPage = () => {
+            const navigate = useNavigate();
+            return (
+                <div className="bg-surface text-on-surface min-h-screen flex overflow-hidden w-full">
+                    <section className="hidden lg:flex lg:w-7/12 relative overflow-hidden flex-col justify-between p-16">
+                        <div className="absolute inset-0 z-0">
+                            <img className="w-full h-full object-cover grayscale contrast-125 opacity-40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAd7UDogedvSSg_HL_JZp8WGbd07jJZ-JA0t0r4a9IhatjdihW-RmMi3XsoL7etwJSu5F-sBHtj5fM3spbNOHHl1KX-phA1rc0GjK2x-z8vlYJDVMvwOxPoyheGjDzNZtpKrLEN9MfJf7W0Canmd58xQ7t0JQWnApPcy2CAPVK55OHfGMIKy05dlFjnNh6ZsVZ9IzH5TA--VmAdsYJgBNwTOFP36iFjF-4D9BP1WTnIcJobI0PwxpxdrMIViTXFYyKg42Ud-TZRUv53"/>
+                            <div className="absolute inset-0 bg-primary opacity-80"></div>
+                        </div>
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-3">
+                                <span className="material-symbols-outlined text-on-primary-container text-4xl">account_balance</span>
+                                <h1 className="text-3xl font-extrabold tracking-tight text-white">Academic <span className="text-on-primary-container">Architect</span></h1>
+                            </div>
+                        </div>
+                        <div className="relative z-10 max-w-xl text-white">
+                            <p className="text-on-primary-container font-medium tracking-widest uppercase text-xs mb-4">Decision Support Platform</p>
+                            <h2 className="text-5xl font-bold leading-tight mb-8">Precision for Institutional Excellence.</h2>
+                            <p className="mt-8 text-lg font-light">Empowering administrators and educators with bespoke data curation and sophisticated analytical tools.</p>
+                        </div>
+                        <div className="relative z-10 text-on-primary-container/60 text-sm">© 2024 Academic Architect System.</div>
+                    </section>
+                    <section className="w-full lg:w-5/12 bg-surface-bright flex items-center justify-center p-8 md:p-16 relative">
+                        <div className="w-full max-w-md">
+                            <h3 className="text-3xl font-bold text-on-surface mb-2">System Portal</h3>
+                            <p className="text-on-surface-variant mb-10">Please authenticate using your institutional credentials.</p>
+                            <div className="grid grid-cols-2 gap-4 p-1.5 bg-surface-container-low rounded-xl mb-8">
+                                <button onClick={() => navigate('/faculty-dashboard')} className="py-3 px-4 rounded-lg bg-surface-container-lowest shadow-sm text-primary font-bold text-sm">Teacher</button>
+                                <button onClick={() => navigate('/admin-dashboard')} className="py-3 px-4 rounded-lg text-on-surface-variant font-semibold text-sm hover:bg-surface-container-high">Administrator</button>
+                            </div>
+                            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); navigate('/admin-dashboard'); }}>
+                                <div>
+                                    <label className="block text-[11px] font-bold uppercase tracking-widest text-on-surface-variant mb-1">Institutional Email</label>
+                                    <input className="w-full border-0 border-b border-outline-variant/30 bg-transparent focus:ring-0 focus:border-primary py-3" placeholder="name@institution.edu" type="email"/>
+                                </div>
+                                <div>
+                                    <label className="block text-[11px] font-bold uppercase tracking-widest text-on-surface-variant mb-1">Password</label>
+                                    <input className="w-full border-0 border-b border-outline-variant/30 bg-transparent focus:ring-0 focus:border-primary py-3" placeholder="••••••••" type="password"/>
+                                </div>
+                                <button className="w-full bg-primary text-white py-4 rounded-xl font-bold shadow-xl hover:opacity-90 transition-all">Sign In to Portal</button>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        const AdminDashboard = () => {
+            const location = useLocation();
+            return (
+                <div className="flex w-full">
+                    <SideNavBar role="admin" activePath={location.pathname} />
+                    <div className="flex-1 flex flex-col">
+                        <TopAppBar title="Institutional Grade Monitoring" />
+                        <main className="p-8 space-y-8 max-w-[1600px] mx-auto w-full">
+                            <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="bg-surface-container-lowest p-6 rounded-xl relative overflow-hidden flex flex-col justify-between min-h-[180px] shadow-sm">
+                                    <p className="text-xs font-bold text-primary tracking-widest uppercase mb-1">Institutional Average</p>
+                                    <h3 className="text-5xl font-black text-on-surface">3.42 <span className="text-lg font-medium text-on-surface-variant">GPA</span></h3>
+                                    <div className="mt-4 flex items-center gap-2 text-green-600 text-sm font-bold">
+                                        <span className="material-symbols-outlined text-sm">trending_up</span>
+                                        <span>+0.12 from last term</span>
+                                    </div>
+                                </div>
+                                <div className="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between border-l-4 border-error/20 shadow-sm">
+                                    <p className="text-xs font-bold text-error tracking-widest uppercase mb-1">Total At-Risk Students</p>
+                                    <h3 className="text-5xl font-black text-on-surface">142</h3>
+                                    <p className="text-on-surface-variant text-sm mt-4 font-medium">GPA below 2.0</p>
+                                </div>
+                                <div className="bg-primary-container p-6 rounded-xl text-white flex flex-col justify-between primary-gradient shadow-lg">
+                                    <p className="text-xs font-bold text-on-primary-container tracking-widest uppercase mb-1">Top Performers</p>
+                                    <h3 className="text-5xl font-black">28%</h3>
+                                    <p className="text-white/80 text-sm mt-4 font-medium">Dean's List (GPA 3.8+)</p>
+                                </div>
+                            </section>
+
+                            <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <div className="lg:col-span-2 bg-surface-container-lowest p-8 rounded-xl shadow-sm">
+                                    <h4 className="text-lg font-bold mb-10">Departmental Distribution</h4>
+                                    <div className="space-y-6">
+                                        {[
+                                            { dept: 'Computer Science & IT', gpa: '3.58', w: '85%' },
+                                            { dept: 'Mechanical Engineering', gpa: '3.22', w: '70%' },
+                                            { dept: 'English Literature', gpa: '3.71', w: '92%' },
+                                            { dept: 'Biological Sciences', gpa: '3.10', w: '65%' }
+                                        ].map(row => (
+                                            <div key={row.dept} className="space-y-2">
+                                                <div className="flex justify-between text-xs font-bold">
+                                                    <span>{row.dept}</span>
+                                                    <span className="text-primary">{row.gpa} GPA</span>
+                                                </div>
+                                                <div className="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+                                                    <div className="h-full bg-primary" style={{width: row.w}}></div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="bg-surface-container-low p-8 rounded-xl flex flex-col text-center">
+                                    <h4 className="text-lg font-bold mb-8">Grade Submission</h4>
+                                    <div className="relative w-40 h-40 mx-auto flex items-center justify-center">
+                                        <svg className="w-full h-full -rotate-90">
+                                            <circle className="text-surface-container-high" cx="80" cy="80" r="70" fill="transparent" stroke="currentColor" strokeWidth="12"></circle>
+                                            <circle className="text-primary" cx="80" cy="80" r="70" fill="transparent" stroke="currentColor" strokeWidth="12" strokeDasharray="440" strokeDashoffset="88"></circle>
+                                        </svg>
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                            <span className="text-3xl font-black">82%</span>
+                                            <span className="text-[10px] font-bold uppercase text-on-surface-variant">Complete</span>
+                                        </div>
+                                    </div>
+                                    <div className="mt-8 space-y-3 w-full">
+                                        <div className="flex justify-between items-center text-sm font-medium">
+                                            <span className="text-on-surface-variant">Submitted</span>
+                                            <span className="font-bold text-primary">1,240</span>
+                                        </div>
+                                        <button className="w-full mt-4 py-3 rounded-lg bg-surface-container-highest font-bold text-xs uppercase tracking-widest">Send Reminders</button>
+                                    </div>
+                                </div>
+                            </section>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const UserManagement = () => {
+            const location = useLocation();
+            return (
+                <div className="flex w-full">
+                    <SideNavBar role="admin" activePath={location.pathname} />
+                    <div className="flex-1 flex flex-col">
+                        <TopAppBar title="Staff & Faculty Directory" />
+                        <main className="p-8 space-y-8">
+                            <section className="flex justify-between items-end">
+                                <div>
+                                    <h2 className="text-3xl font-extrabold tracking-tight">Staff & Faculty Directory</h2>
+                                    <p className="text-on-surface-variant font-medium mt-1">Manage institutional access and roles across 12 departments.</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button className="px-6 py-2.5 bg-primary text-white font-semibold rounded-md flex items-center gap-2 primary-gradient">
+                                        <span className="material-symbols-outlined text-lg">person_add</span>
+                                        Add New User
+                                    </button>
+                                </div>
+                            </section>
+                            <div className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="bg-surface-container-low">
+                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-primary">Name</th>
+                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-primary">Role</th>
+                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-primary">Department</th>
+                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-primary">Status</th>
+                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-primary text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-outline-variant/10">
+                                        {[
+                                            { name: "Dr. Julianne Danvers", role: "Teacher", dept: "Natural Sciences", status: "Active", bg: "bg-primary-fixed" },
+                                            { name: "Marcus Rodriguez", role: "Admin", dept: "Operations", status: "Active", bg: "bg-tertiary-fixed" },
+                                            { name: "Sarah Hendersen", role: "Teacher", dept: "Humanities", status: "On Leave", bg: "bg-slate-200" }
+                                        ].map((user, i) => (
+                                            <tr key={i} className="hover:bg-surface-container-low transition-colors">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`h-9 w-9 rounded-full flex items-center justify-center font-bold text-xs ${user.bg}`}>{user.name.split(' ').map(n => n[0]).join('')}</div>
+                                                        <div>
+                                                            <div className="text-sm font-bold">{user.name}</div>
+                                                            <div className="text-xs text-on-surface-variant">email@academic.edu</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4"><span className="px-2.5 py-1 bg-secondary-container text-xs font-bold rounded-full">{user.role}</span></td>
+                                                <td className="px-6 py-4 text-sm font-medium">{user.dept}</td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className={`h-2 w-2 rounded-full ${user.status === 'Active' ? 'bg-green-500' : 'bg-amber-500'}`}></span>
+                                                        <span className="text-xs font-bold">{user.status}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <button className="p-2 text-outline hover:text-primary"><span className="material-symbols-outlined text-lg">edit</span></button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const FacultyDashboard = () => {
+            const location = useLocation();
+            return (
+                <div className="flex w-full">
+                    <SideNavBar role="faculty" activePath={location.pathname} />
+                    <div className="flex-1 flex flex-col">
+                        <TopAppBar title="Teacher Overview" />
+                        <main className="p-8 space-y-8 max-w-[1600px] mx-auto w-full">
+                            <div className="relative overflow-hidden bg-gradient-to-br from-[#002b57] to-[#1a4173] rounded-xl p-10 text-white shadow-lg">
+                                <div className="relative z-10 flex flex-col md:flex-row justify-between items-end gap-8">
+                                    <div className="space-y-2">
+                                        <span className="text-sm font-bold tracking-[0.2em] opacity-80 uppercase">Performance Portal</span>
+                                        <h2 className="text-4xl font-extrabold tracking-tight">Dr. Julian Vane</h2>
+                                        <p className="text-blue-100 max-w-md font-light">Aggregated academic health across all managed sections.</p>
+                                    </div>
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-6xl font-black">84.2%</span>
+                                        <span className="text-xs font-bold uppercase tracking-widest">Aggregate Score</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between shadow-sm">
+                                    <p className="text-sm font-bold text-on-surface-variant">Participation</p>
+                                    <p className="text-3xl font-extrabold text-on-surface">92%</p>
+                                </div>
+                                <div className="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between shadow-sm">
+                                    <p className="text-sm font-bold text-on-surface-variant">Submission Rate</p>
+                                    <p className="text-3xl font-extrabold text-on-surface">88%</p>
+                                </div>
+                                <div className="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between shadow-sm">
+                                    <p className="text-sm font-bold text-on-surface-variant">Attendance</p>
+                                    <p className="text-3xl font-extrabold text-on-surface">95%</p>
+                                </div>
+                            </div>
+                            <div className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+                                <div className="p-6 border-b border-outline-variant/10">
+                                    <h3 className="text-xl font-bold">At-Risk Students</h3>
+                                </div>
+                                <table className="w-full text-left">
+                                    <tbody className="divide-y divide-outline-variant/10">
+                                        {['Julian Wallace', 'Elena Martinez', 'Sophia Reed'].map((name, i) => (
+                                            <tr key={i} className="hover:bg-surface-container-low transition-colors">
+                                                <td className="px-6 py-4 flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold">{name.split(' ').map(n => n[0]).join('')}</div>
+                                                    <span className="text-sm font-semibold">{name}</span>
+                                                </td>
+                                                <td className="px-6 py-4"><span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded">Intervention Required</span></td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <button className="text-primary text-sm font-bold">View Profile</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const ClassManagement = () => {
+            const location = useLocation();
+            const navigate = useNavigate();
+            return (
+                <div className="flex w-full">
+                    <SideNavBar role="faculty" activePath={location.pathname} />
+                    <div className="flex-1 flex flex-col">
+                        <TopAppBar title="Class Management" />
+                        <main className="p-8">
+                            <div className="flex justify-between items-end mb-12">
+                                <div>
+                                    <h2 className="text-3xl font-extrabold tracking-tight text-primary">Managed Sections</h2>
+                                    <p className="text-on-surface-variant font-medium">Strategic overview of your academic divisions.</p>
+                                </div>
+                                <button className="primary-gradient text-white px-6 py-3 rounded-md font-bold text-sm flex items-center gap-2 shadow-lg">
+                                    <span className="material-symbols-outlined">add</span> Create New Class
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {[
+                                    { code: 'MATH-G10-A', title: 'Grade 10 Math', room: 'Alpha Pavilion', count: 28, path: '/class-detail' },
+                                    { code: 'PHYS-G11-B', title: 'Grade 11 Physics', room: 'Newton Labs', count: 24, path: '/class-detail' },
+                                    { code: 'BIO-G12-C', title: 'Grade 12 Biology', room: 'Darwin Wing', count: 32, path: '/class-detail' }
+                                ].map((item, idx) => (
+                                    <div key={idx} onClick={() => navigate(item.path)} className="bg-surface-container-lowest p-6 rounded-lg hover:bg-surface-container-high transition-all cursor-pointer shadow-sm min-h-[220px] flex flex-col justify-between">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <span className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1 block">{item.code}</span>
+                                                <h3 className="text-xl font-bold text-primary">{item.title}</h3>
+                                            </div>
+                                            <span className="bg-primary/10 text-primary-container px-3 py-1 rounded-full text-[10px] font-extrabold">ACTIVE</span>
+                                        </div>
+                                        <div className="mt-8 flex items-end justify-between">
+                                            <div>
+                                                <p className="text-sm text-on-surface-variant">Section</p>
+                                                <p className="text-lg font-bold">{item.room}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-3xl font-extrabold text-primary leading-none">{item.count}</p>
+                                                <p className="text-xs font-bold text-on-surface-variant">STUDENTS</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const ClassDetail = () => {
+            const location = useLocation();
+            return (
+                <div className="flex w-full">
+                    <SideNavBar role="faculty" activePath={location.pathname} />
+                    <div className="flex-1 flex flex-col">
+                        <TopAppBar title="Grade 10 - Mathematics" />
+                        <main className="p-8 space-y-8">
+                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                                <div>
+                                    <h2 className="text-4xl font-extrabold text-primary tracking-tight">Grade 10 - Mathematics</h2>
+                                    <p className="text-on-surface-variant mt-1 font-medium">Year 2023/24 • Period 4 • Room 302</p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <Link to="/attendance-realtime" className="px-5 py-2.5 rounded-md text-sm font-semibold flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest text-primary-container transition-all">
+                                        <span className="material-symbols-outlined text-[18px]">how_to_reg</span> Mark Attendance
+                                    </Link>
+                                    <button className="px-5 py-2.5 rounded-md text-sm font-bold flex items-center gap-2 primary-gradient text-white shadow-lg">
+                                        <span className="material-symbols-outlined text-[18px]">edit_square</span> Enter Grades
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                <div className="bg-surface-container-lowest p-6 rounded-xl shadow-sm">
+                                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Average Grade</span>
+                                    <div className="flex items-baseline gap-2 mt-2">
+                                        <span className="text-3xl font-extrabold text-primary">84.2%</span>
+                                        <span className="text-xs font-bold text-green-600">+2.4%</span>
+                                    </div>
+                                </div>
+                                <div className="bg-surface-container-lowest p-6 rounded-xl shadow-sm">
+                                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Attendance</span>
+                                    <div className="flex items-baseline gap-2 mt-2">
+                                        <span className="text-3xl font-extrabold text-primary">96.8%</span>
+                                    </div>
+                                </div>
+                                <div className="bg-surface-container-lowest p-6 rounded-xl shadow-sm">
+                                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">At-Risk</span>
+                                    <div className="flex items-baseline gap-2 mt-2">
+                                        <span className="text-3xl font-extrabold text-error">3</span>
+                                    </div>
+                                </div>
+                                <div className="bg-surface-container-lowest p-6 rounded-xl shadow-sm border-l-4 border-primary">
+                                    <span className="text-xs font-bold uppercase tracking-wider">Next Task</span>
+                                    <p className="text-lg font-bold text-primary mt-1">Mid-Term Exam</p>
+                                    <p className="text-xs font-medium text-on-surface-variant">Friday, Oct 27</p>
+                                </div>
+                            </div>
+                            <div className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+                                <div className="px-8 py-6 flex items-center justify-between border-b">
+                                    <h3 className="text-lg font-bold">Student Roster</h3>
+                                </div>
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="bg-surface-container-low text-[11px] font-bold text-primary uppercase tracking-widest">
+                                            <th className="px-8 py-4">Student</th>
+                                            <th className="px-8 py-4">Overall Grade</th>
+                                            <th className="px-8 py-4">Attendance</th>
+                                            <th className="px-8 py-4">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-outline-variant/10">
+                                        {['Elena Martinez', 'Julian Dawson', 'Sarah White'].map((name, i) => (
+                                            <tr key={i} className="hover:bg-surface-container transition-colors">
+                                                <td className="px-8 py-5">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold">{name.split(' ').map(n => n[0]).join('')}</div>
+                                                        <span className="text-sm font-bold">{name}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-8 py-5"><span className="text-sm font-bold">88.7%</span></td>
+                                                <td className="px-8 py-5 text-sm">98%</td>
+                                                <td className="px-8 py-5">
+                                                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${name === 'Julian Dawson' ? 'bg-error-container/30 text-error' : 'bg-blue-50 text-blue-700'}`}>
+                                                        {name === 'Julian Dawson' ? 'At-Risk' : 'Stable'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const AttendanceRealtime = () => {
+            const location = useLocation();
+            return (
+                <div className="flex w-full">
+                    <SideNavBar role="faculty" activePath={location.pathname} />
+                    <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                        <TopAppBar title="Real-time Attendance" />
+                        <main className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                            <div className="grid grid-cols-12 gap-6 mb-8">
+                                <div className="col-span-8 bg-primary-container rounded-2xl p-6 flex justify-between items-center text-white shadow-lg primary-gradient">
+                                    <div>
+                                        <h3 className="text-sm font-medium text-blue-200 uppercase tracking-widest mb-1">Live Session</h3>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-5xl font-black">28</span>
+                                            <span className="text-lg text-blue-200">/ 32 Present</span>
+                                        </div>
+                                        <p className="text-xs text-blue-100/70 mt-2 font-medium">Class started 14 minutes ago</p>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <div className="bg-white/10 px-4 py-3 rounded-xl border border-white/10 text-center min-w-[80px]">
+                                            <span className="block text-2xl font-bold">2</span>
+                                            <span className="block text-[10px] uppercase font-bold text-blue-100">Absent</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-span-4 bg-surface-container-lowest rounded-2xl p-6 border border-slate-200/50 flex flex-col justify-center shadow-sm">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <span className="text-sm font-bold text-[#1A4173]">Engagement Rate</span>
+                                        <span className="text-xs font-bold text-emerald-600">+4.2%</span>
+                                    </div>
+                                    <div className="w-full bg-slate-100 h-2 rounded-full mb-4 overflow-hidden">
+                                        <div className="h-full primary-gradient rounded-full" style={{width: '87.5%'}}></div>
+                                    </div>
+                                    <p className="text-xs text-on-surface-variant leading-relaxed">Attendance is trending higher than last month.</p>
+                                </div>
+                            </div>
+                            <div className="bg-surface-container-lowest rounded-2xl border border-slate-200/50 overflow-hidden shadow-sm">
+                                <div className="p-4 bg-surface-container-low/30 flex items-center justify-between">
+                                    <h3 className="text-sm font-bold">Seating Chart Mode</h3>
+                                    <button className="px-4 py-2 text-xs font-bold rounded-lg border bg-emerald-50 text-emerald-700">Mark All Present</button>
+                                </div>
+                                <div className="p-8 grid grid-cols-4 gap-6">
+                                    {[
+                                        { name: 'Marcus Chen', status: 'Present', color: 'emerald' },
+                                        { name: 'Elena Rodriguez', status: 'Tardy', color: 'amber' },
+                                        { name: 'Jameson Wright', status: 'Absent', color: 'rose' },
+                                        { name: 'Sarah Jenkins', status: 'Present', color: 'emerald' }
+                                    ].map((student, i) => (
+                                        <div key={i} className={`p-4 rounded-xl shadow-sm border-l-4 border-${student.color}-500 bg-surface-container-lowest hover:shadow-md transition-shadow cursor-pointer`}>
+                                            <div className="flex items-center space-x-3">
+                                                <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-xs">{student.name.split(' ').map(n => n[0]).join('')}</div>
+                                                <div className="flex-1">
+                                                    <h4 className="text-sm font-bold truncate">{student.name}</h4>
+                                                    <span className={`text-[10px] font-medium text-${student.color}-700 uppercase`}>{student.status}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </main>
+                        <footer className="h-12 bg-surface-container-low border-t flex items-center justify-between px-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            <div>Last synced: 2 minutes ago</div>
+                            <div className="flex gap-4"><a href="#">System Status</a><a href="#">Help</a></div>
+                        </footer>
+                    </div>
+                </div>
+            );
+        };
+
+        const StudentDirectory = () => {
+            const location = useLocation();
+            return (
+                <div className="flex w-full">
+                    <SideNavBar role="admin" activePath={location.pathname} />
+                    <div className="flex-1 flex flex-col">
+                        <TopAppBar title="Student Directory" />
+                        <main className="p-8 space-y-8">
+                            <section className="flex justify-between items-end">
+                                <div>
+                                    <h2 className="text-3xl font-extrabold text-primary tracking-tight">Student Directory</h2>
+                                    <p className="text-on-surface-variant mt-1">Currently managing <span className="text-primary font-bold">1,284 students</span>.</p>
+                                </div>
+                                <button className="px-5 py-2.5 bg-primary text-white rounded-lg font-semibold text-sm shadow-sm hover:shadow-md">
+                                    <span className="material-symbols-outlined text-lg mr-2 align-middle">person_add</span> Add Student
+                                </button>
+                            </section>
+                            <div className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+                                <table className="w-full text-left">
+                                    <thead className="bg-surface-container-low border-b">
+                                        <tr className="text-[11px] font-black uppercase tracking-wider text-primary">
+                                            <th className="px-6 py-4">Student Name</th>
+                                            <th className="px-6 py-4">ID</th>
+                                            <th className="px-6 py-4">Primary Class</th>
+                                            <th className="px-6 py-4">Grade</th>
+                                            <th className="px-6 py-4">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-50">
+                                        {[
+                                            { name: "Elena Rodriguez", id: "STU-882190", class: "Physics", grade: "94% A", status: "Excelling", sColor: "blue" },
+                                            { name: "Marcus Thompson", id: "STU-221044", class: "Math", grade: "68% D+", status: "At-Risk", sColor: "error" },
+                                            { name: "Sarah Jenkins", id: "STU-119330", class: "Modern Lit", grade: "82% B", status: "Stable", sColor: "secondary" }
+                                        ].map((stu, i) => (
+                                            <tr key={i} className="hover:bg-slate-50 transition-colors">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-xs">{stu.name.split(' ').map(n => n[0]).join('')}</div>
+                                                        <span className="text-sm font-bold">{stu.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-xs font-mono">{stu.id}</td>
+                                                <td className="px-6 py-4 text-sm font-medium">{stu.class}</td>
+                                                <td className="px-6 py-4 text-sm font-bold text-primary">{stu.grade}</td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`px-3 py-1 bg-${stu.sColor === 'error' ? 'error-container' : 'blue-50'} text-xs font-bold uppercase tracking-wider rounded-full`}>{stu.status}</span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const EarlyWarning = () => {
+            const location = useLocation();
+            return (
+                <div className="flex w-full">
+                    <SideNavBar role="admin" activePath={location.pathname} />
+                    <div className="flex-1 flex flex-col">
+                        <TopAppBar title="Early Warning System" />
+                        <main className="p-8 flex gap-8">
+                            <div className="flex-1 space-y-6">
+                                <h2 className="text-3xl font-extrabold text-primary tracking-tight">System Flags</h2>
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    {[
+                                        { name: 'Julian Sterling', major: 'Junior • CS', alerts: ['5 absences', 'Low quiz scores'], color: 'primary' },
+                                        { name: 'Elena Rodriguez', major: 'Senior • ME', alerts: ['Tuition balance due', 'Low LMS engagement'], color: 'tertiary' }
+                                    ].map((student, i) => (
+                                        <div key={i} className="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/10 shadow-sm flex flex-col justify-between min-h-[300px]">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center font-bold text-xl bg-${student.color}-fixed`}>{student.name.split(' ').map(n => n[0]).join('')}</div>
+                                                    <div><h3 className="text-lg font-bold">{student.name}</h3><p className="text-xs font-semibold text-primary uppercase">{student.major}</p></div>
+                                                </div>
+                                                <span className="px-3 py-1 bg-error-container text-on-error-container rounded-full text-[10px] font-bold uppercase">Priority</span>
+                                            </div>
+                                            <ul className="space-y-2 my-6">
+                                                {student.alerts.map((a, idx) => (
+                                                    <li key={idx} className="flex items-center text-sm text-on-surface-variant font-medium">
+                                                        <span className="material-symbols-outlined text-error text-base mr-2">error</span>{a}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                            <button className="w-full bg-primary text-white text-xs font-bold py-3 rounded-lg uppercase tracking-wider primary-gradient">Initiate Intervention</button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <aside className="w-[340px] space-y-6">
+                                <div className="bg-surface-container-low rounded-2xl p-6">
+                                    <h3 className="text-sm font-extrabold text-primary uppercase mb-6 border-b pb-4">Flag Summary</h3>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-4xl font-bold">12</span>
+                                            <span className="text-xs font-bold uppercase text-on-surface-variant">Active Flags</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aside>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const ParentReporting = () => {
+            const location = useLocation();
+            return (
+                <div className="flex w-full">
+                    <SideNavBar role="admin" activePath={location.pathname} />
+                    <div className="flex-1 flex flex-col">
+                        <TopAppBar title="Parent Reporting Portal" />
+                        <main className="p-8 space-y-8">
+                            <div className="flex justify-between items-end">
+                                <div><h2 className="text-3xl font-extrabold text-primary">Parent Reporting</h2><p className="text-on-surface-variant">Generate bi-weekly performance narratives for guardians.</p></div>
+                                <button className="primary-gradient px-8 py-3 rounded-xl text-white font-bold flex items-center gap-3 shadow-xl">
+                                    <span className="material-symbols-outlined">send</span> Send Reports
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-12 gap-6">
+                                <div className="col-span-8 bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+                                    <table className="w-full text-left">
+                                        <thead className="bg-surface-container-low/50 font-bold text-xs text-primary uppercase">
+                                            <tr><th className="p-4">Student</th><th className="p-4 text-center">Avg Grade</th><th className="p-4">Parent Email</th></tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-surface-container-low text-sm">
+                                            {['Alexander Sterling', 'Elena Rodriguez', 'Julian Vance'].map((name, i) => (
+                                                <tr key={i} className="hover:bg-surface-container-low transition-colors">
+                                                    <td className="p-4 font-semibold">{name}</td>
+                                                    <td className="p-4 text-center"><span className="bg-green-100 px-2 py-1 rounded font-bold">94%</span></td>
+                                                    <td className="p-4 text-xs font-mono text-on-surface-variant">parent@domain.com</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="col-span-4 bg-surface-container-lowest rounded-xl flex flex-col shadow-lg">
+                                    <div className="p-6 bg-primary text-white rounded-t-xl"><h3 className="font-bold flex items-center gap-2"><span className="material-symbols-outlined text-sm">visibility</span> Preview</h3></div>
+                                    <div className="p-6 bg-surface-container-low/20 flex-1 flex flex-col">
+                                        <div className="bg-white p-6 rounded shadow-sm flex-1">
+                                            <h4 className="text-sm font-bold text-primary mb-4">Academic Summary</h4>
+                                            <p className="text-xs mb-4">Dear Parent, this is the performance report for your student...</p>
+                                            <div className="grid grid-cols-2 gap-2 mb-4">
+                                                <div className="bg-surface p-2 rounded text-center"><span className="block text-[10px] uppercase font-bold text-on-surface-variant">Grade</span><span className="text-lg font-black text-primary">A</span></div>
+                                                <div className="bg-surface p-2 rounded text-center"><span className="block text-[10px] uppercase font-bold text-on-surface-variant">Attend.</span><span className="text-lg font-black text-primary">100%</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const GradeMonitoring = () => {
+            const location = useLocation();
+            return (
+                <div className="flex w-full">
+                    <SideNavBar role="admin" activePath={location.pathname} />
+                    <div className="flex-1 flex flex-col">
+                        <TopAppBar title="Institutional Analytics" />
+                        <main className="p-8 space-y-8">
+                            <h2 className="text-3xl font-extrabold text-primary">Departmental Analytics</h2>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div className="bg-surface-container-lowest p-8 rounded-xl shadow-sm">
+                                    <h4 className="text-lg font-bold mb-6">Weekly Trends</h4>
+                                    <div className="h-48 w-full flex items-end justify-between px-4 pb-4 bg-slate-50 rounded-lg">
+                                        {[40, 70, 45, 90, 65].map((h, i) => (
+                                            <div key={i} className="w-8 bg-primary rounded-t-sm" style={{height: `${h}%`}}></div>
+                                        ))}
+                                    </div>
+                                    <div className="flex justify-between mt-4 text-[10px] font-bold text-on-surface-variant px-4">
+                                        <span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span>
+                                    </div>
+                                </div>
+                                <div className="space-y-6">
+                                    <div className="bg-primary p-6 rounded-xl text-white primary-gradient shadow-lg">
+                                        <p className="text-xs font-bold uppercase tracking-widest opacity-80 mb-4">System Predictor</p>
+                                        <p className="text-xl font-light">Projected attendance for final exams: <span className="font-bold">96.5%</span></p>
+                                    </div>
+                                    <div className="bg-surface-container-lowest p-6 rounded-xl shadow-sm">
+                                        <h4 className="text-sm font-bold mb-4 uppercase text-primary tracking-widest">Dept. Comparison</h4>
+                                        <div className="space-y-4">
+                                            <div><div className="flex justify-between text-xs font-bold mb-1"><span>Applied Sciences</span><span>98.2%</span></div><div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-primary" style={{width: '98.2%'}}></div></div></div>
+                                            <div><div className="flex justify-between text-xs font-bold mb-1"><span>Humanities</span><span>85.4%</span></div><div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-primary" style={{width: '85.4%'}}></div></div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Main App ---
+
+        const App = () => {
+            return (
+                <MemoryRouter>
+                    <Routes>
+                        <Route path="/" element={<LoginPage />} />
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                        <Route path="/user-management" element={<UserManagement />} />
+                        <Route path="/faculty-dashboard" element={<FacultyDashboard />} />
+                        <Route path="/class-management" element={<ClassManagement />} />
+                        <Route path="/class-detail" element={<ClassDetail />} />
+                        <Route path="/attendance-realtime" element={<AttendanceRealtime />} />
+                        <Route path="/student-directory" element={<StudentDirectory />} />
+                        <Route path="/early-warning" element={<EarlyWarning />} />
+                        <Route path="/parent-reporting" element={<ParentReporting />} />
+                        <Route path="/grade-monitoring" element={<GradeMonitoring />} />
+                    </Routes>
+                </MemoryRouter>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

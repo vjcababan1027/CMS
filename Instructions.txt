@@ -1,0 +1,175 @@
+MASTER PROMPT: INTELLIGENT DECISION SUPPORT SYSTEM
+
+Prompt:
+
+Create a full-stack web-based Intelligent Decision Support System for School Performance Enhancement using the following technologies:
+
+Frontend: React.js
+Backend: FastAPI (Python)
+Database: PostgreSQL
+AI/ML: Scikit-learn or XGBoost
+
+The system must include the following modules and features:
+
+🔐 1. USER MANAGEMENT MODULE
+Role-based access (Admin, Teacher)
+JWT authentication (login/logout)
+User CRUD (add, edit, deactivate)
+Role-based authorization
+👨‍🎓 2. STUDENT PROFILE MANAGEMENT
+Store student details:
+Name, ID, course, year level, section
+Parent/Guardian name, email, contact number
+Assign students to classes using class codes
+Prevent duplicate student records
+View individual academic records
+🏫 3. CLASS MANAGEMENT MODULE
+Create/manage classes per subject
+Unique class code
+Assign teachers to classes
+Add/remove students using class codes
+Separate records per class
+📅 4. ATTENDANCE MANAGEMENT SYSTEM
+Interactive attendance marking (click student names)
+Store attendance per date/session
+Generate attendance summary
+Include attendance in performance evaluation
+📝 5. GRADING MANAGEMENT SYSTEM
+A. Grading Components
+Quizzes
+Oral Participation
+Graded Activity
+Attendance
+Major Exam
+B. Weight Distribution
+Total must equal 100%
+User can customize percentage per component
+Validate before saving
+C. Grading Periods
+Prelim
+Midterm
+Semi-Finals
+Finals
+D. Grade Encoding
+Input scores per:
+Student
+Class
+Period
+Component
+Spreadsheet-style UI
+E. Grade Computation
+Automatically compute grades using dynamic weights:
+
+Final Grade =
+(Quizzes × weight) +
+(Oral × weight) +
+(Activity × weight) +
+(Attendance × weight) +
+(Exam × weight)
+
+Compute per period and overall final grade
+🔄 6. GRADE TRANSMUTATION SYSTEM
+Convert raw grade (0–100) into transmuted grade (1.0–5.0 scale)
+Use predefined mapping table (provided)
+Store mapping in database
+Return:
+Raw Grade
+Transmuted Grade
+📊 7. GRADE SUMMARY & REPORTS
+Show grades per:
+Prelim, Midterm, Semi-Finals, Finals
+Show overall final grade
+Show breakdown per component
+Export (PDF/CSV optional)
+Include charts/graphs (optional)
+⚠️ 8. EARLY WARNING SYSTEM (EWS)
+Detect at-risk students based on:
+Low grades
+Poor attendance
+Missing requirements
+Classify:
+Low Risk
+Moderate Risk
+High Risk
+Real-time alerts for teachers
+Track performance trends per grading period
+🤖 9. AI/ML INTEGRATION
+Train model using:
+Grades
+Attendance
+Submission data
+Use Scikit-learn or XGBoost
+Predict at-risk students
+Expose prediction API via FastAPI
+💡 10. INTERVENTION RECOMMENDATION SYSTEM
+Suggest actions based on risk:
+Remedial classes
+Extra assignments
+Counseling
+Parent notification
+Display recommendations per student
+🗄️ 11. CENTRALIZED RECORD MANAGEMENT
+PostgreSQL database
+Normalized tables:
+Users, Students, Classes, Grades, Attendance, Parents
+Ensure:
+Data consistency
+Referential integrity
+📊 12. DASHBOARD SYSTEM
+Teacher Dashboard:
+Class performance
+At-risk students
+Admin Dashboard:
+Overall analytics
+Grade submission monitoring
+Use charts and summary cards
+🔔 13. NOTIFICATION SYSTEM
+Alerts for:
+At-risk students
+Missing grades
+Deadlines
+Real-time frontend notifications (toasts)
+📧 14. PARENT EMAIL NOTIFICATION SYSTEM
+A. Features
+Send automated email every 2 weeks
+Include:
+Student grades (per period)
+Attendance summary
+Risk level
+Teacher remarks
+B. Behavior
+If HIGH RISK → send immediate alert
+Use SMTP email service
+C. Scheduler
+Use APScheduler / Celery / cron job
+D. Email Logs
+Store:
+Date sent
+Status (success/fail)
+✅ 15. DATA VALIDATION & INTEGRITY
+Prevent duplicate records
+Validate grading weights = 100%
+Required fields enforcement
+Error handling
+🔒 16. SECURITY & DATA PROTECTION
+JWT authentication
+Password hashing (bcrypt)
+Role-based access control
+Protect sensitive student data
+📐 17. SYSTEM DESIGN REQUIREMENTS
+Provide:
+ERD (Entity Relationship Diagram)
+API structure (REST endpoints)
+System architecture diagram
+Follow clean architecture principles
+🎯 OUTPUT REQUIREMENTS
+
+Generate:
+
+Database schema (PostgreSQL)
+FastAPI backend (routes, models, services)
+React.js frontend structure (pages/components)
+AI model training + integration
+Email scheduler implementation
+Sample UI for grading and dashboard
+Complete working architecture
